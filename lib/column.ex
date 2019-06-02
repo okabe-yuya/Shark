@@ -16,23 +16,41 @@ defmodule SharkColumn do
   end
 
   def remove_header(cdl, column_name) do
-    key_index_num =
-      cdl
-      |> res_cdl_header()
-      |> Enum.find_index(fn val -> val == column_name end)
+    key_index_num = val_index_in_header(cdl, column_name)
     Stream.map(cdl, &(List.delete_at(&1, key_index_num)))
   end
 
   def is_exist_name_in_header(cdl, column_name) do
     cdl
-    |> res_cdl_header()
+    |> cdl_header_list(false)
     |> Enum.member?(column_name)
   end
 
-  def res_cdl_header(cdl) do
+  def header_update(cdl, before, after_) do
+    index_num = val_index_in_header(cdl, before)
+    header =
+      cdl_header_list(cdl, true)
+      |> Stream.map(&(List.update_at(&1, index_num, fn _ -> after_ end)))
+    Stream.concat(header, Stream.drop(cdl, 1))
+  end
+
+  def cdl_header_list(cdl, false) do
     cdl
     |> Stream.take(1)
     |> Enum.to_list()
     |> List.first()
+  end
+  def cdl_header_list(cdl, _), do: cdl |> Stream.take(1)
+
+  def val_index_in_header(cdl, column_name) do
+    cdl
+    |> cdl_header_list(false)
+    |> Enum.find_index(fn val -> val == column_name end)
+  end
+
+  def header_size(cdl) do
+    cdl
+    |> cdl_header_list(false)
+    |> Enum.count()
   end
 end
