@@ -20,7 +20,6 @@ defmodule Shark do
             value_lst
           end)
         {:ok, file_stream}
-        # {:ok, Enum.to_list(file_stream)}
       false ->
         {:error, "#{file_path}: no such file or directory"}
     end
